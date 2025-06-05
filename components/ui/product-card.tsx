@@ -130,17 +130,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </p>
           
           <div className="flex flex-wrap gap-1 mb-3">
-            {product.category === "jerseys" && product.sizes.length > 0 && (
+            {product.category === "jerseys" && product.sizes && product.sizes.length > 0 && (
               <div className="flex gap-1">
-                {product.sizes.slice(0, 3).map((size) => (
-                  <Badge key={size} variant="outline" className="text-xs">
+                {product.sizes.slice(0, 3).map((size: string) => (
+                  <div key={size} className="text-xs border rounded-full px-2 py-0.5">
                     {size}
-                  </Badge>
+                  </div>
                 ))}
                 {product.sizes.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <div className="text-xs border rounded-full px-2 py-0.5">
                     +{product.sizes.length - 3}
-                  </Badge>
+                  </div>
                 )}
               </div>
             )}
