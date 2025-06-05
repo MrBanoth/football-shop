@@ -32,20 +32,20 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     notFound();
   }
 
-  // Ensure the product data matches the Product type
+  // Transform product data to match the Product type
   const product: Product = {
     id: productData.id,
     name: productData.name,
     price: productData.price,
     description: productData.description,
-    category: productData.category as "jerseys" | "shoes" | "balls" | "accessories",
-    sizes: productData.sizes || [],
-    colors: productData.colors || [],
-    images: productData.images || [],
-    rating: productData.rating || 0,
-    featured: productData.featured || false,
-    stock: productData.stock || 0
-  };
+    category: productData.category,
+    images: productData.images,
+    stock: productData.stock || 0,
+    rating: 'rating' in productData ? (productData as any).rating : 0,
+    featured: 'featured' in productData ? (productData as any).featured : false,
+    sizes: 'sizes' in productData ? (productData as any).sizes || [] : [],
+    colors: 'colors' in productData ? (productData as any).colors || [] : [],
+  } as Product;
 
   // Get related products (same category)
   const relatedProducts = productsData.products
@@ -58,10 +58,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
-    product.sizes.length > 0 ? product.sizes[0] : undefined
+    product.sizes?.length ? product.sizes[0] : undefined
   );
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
-    product.colors.length > 0 ? product.colors[0] : undefined
+    product.colors?.length ? product.colors[0] : undefined
   );
 
   // Check if product is already in cart
@@ -83,7 +83,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   // Handle add to cart
   const handleAddToCart = () => {
     if (!alreadyInCart && product.stock > 0) {
-      addToCart(product, quantity, selectedSize, selectedColor);
+      const cartProduct: Product = {
+        ...product,
+        sizes: product.sizes || [],
+        colors: product.colors || [],
+        featured: product.featured || false
+      };
+      addToCart(cartProduct, quantity, selectedSize, selectedColor);
     }
   };
 
@@ -148,19 +154,24 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   <Star
                     key={i}
                     className={`h-4 w-4 ${
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.rating || 0)
                         ? "fill-yellow-400 text-yellow-400"
                         : "text-gray-300"
                     }`}
                   />
                 ))}
+                <span className="text-sm text-muted-foreground ml-2">
+                  {product.rating.toFixed(1)} / 5.0
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {product.rating} / 5.0
-              </span>
             </div>
             <div className="mt-4 text-2xl font-semibold">
               {formatPrice(product.price)}
+              {('discount' in product && (product as any).discount) ? (
+                <span className="ml-2 text-base text-red-500 line-through">
+                  {formatPrice(product.price / (1 - ((product as any).discount / 100)))}
+                </span>
+              ) : null}
             </div>
           </div>
 
@@ -176,55 +187,38 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             {product.sizes.length > 0 && (
               <div>
                 <h3 className="text-lg font-medium mb-4">Select Size</h3>
-                <RadioGroup
-                  value={selectedSize}
-                  onValueChange={setSelectedSize}
-                  className="grid grid-cols-4 sm:grid-cols-6 gap-2"
-                >
-                  {product.sizes.map((size) => (
-                    <div key={size}>
-                      <RadioGroupItem
-                        value={size}
-                        id={`size-${size}`}
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor={`size-${size}`}
-                        className="flex h-10 w-full items-center justify-center rounded-md border border-muted bg-popover p-2 text-center font-medium peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 cursor-pointer"
-                      >
-                        {size}
-                      </Label>
-                    </div>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {product.sizes?.map((size: string) => (
+                    <Button
+                      key={size}
+                      variant={selectedSize === size ? 'default' : 'outline'}
+                      className="h-10 min-w-14 px-3"
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </Button>
                   ))}
-                </RadioGroup>
+                </div>
               </div>
             )}
 
             {/* Color Selection */}
-            {product.colors.length > 0 && (
+            {product.colors && product.colors.length > 0 && (
               <div>
                 <h3 className="text-lg font-medium mb-4">Select Color</h3>
-                <RadioGroup
-                  value={selectedColor}
-                  onValueChange={setSelectedColor}
-                  className="grid grid-cols-4 sm:grid-cols-6 gap-2"
-                >
-                  {product.colors.map((color) => (
-                    <div key={color}>
-                      <RadioGroupItem
-                        value={color}
-                        id={`color-${color}`}
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor={`color-${color}`}
-                        className="flex h-10 w-full items-center justify-center rounded-md border border-muted bg-popover p-2 text-center font-medium peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 cursor-pointer"
-                      >
-                        {color}
-                      </Label>
-                    </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.colors.map((color: string) => (
+                    <Button
+                      key={color}
+                      variant={selectedColor === color ? 'default' : 'outline'}
+                      className="h-10 w-10 rounded-full p-0"
+                      style={{ backgroundColor: color }}
+                      onClick={() => setSelectedColor(color)}
+                    >
+                      <span className="sr-only">{color}</span>
+                    </Button>
                   ))}
-                </RadioGroup>
+                </div>
               </div>
             )}
 
