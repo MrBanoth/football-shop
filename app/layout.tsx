@@ -6,8 +6,16 @@ import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-context';
+import 'react-icons/fa';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { cn } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the loader with no SSR
+const FootballLoader = dynamic(
+  () => import('@/components/ui/FootballLoader'),
+  { ssr: false }
+);
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -42,6 +50,7 @@ export default function RootLayout({
           <CartProvider>
             <AuthProvider>
               <div className="relative flex min-h-screen flex-col">
+                <FootballLoader />
                 <Navbar />
                 <main className="flex-1">{children}</main>
                 <Footer />
