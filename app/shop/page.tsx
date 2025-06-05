@@ -138,8 +138,8 @@ export default function ShopPage() {
           </div>
           
           {/* Category Navigation */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-            <div className="flex gap-2 flex-nowrap">
+          <div className="flex items-center gap-2 pb-2">
+            <div className="flex gap-2 flex-wrap">
               {categories.map((cat) => (
                 <Button
                   key={cat.value}

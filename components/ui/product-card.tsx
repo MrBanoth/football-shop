@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/types";
 import { formatPrice, truncateText } from "@/lib/utils";
 import { useCart } from "@/context/cart-context";
+import { useWishlist } from "@/context/wishlist-context";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -23,14 +24,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   featured = false, 
   className 
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addToCart, isInCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const alreadyInCart = isInCart(product.id);
+  const isLiked = isInWishlist(product.id);
 
   const toggleLike = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsLiked(!isLiked);
+    e.stopPropagation();
+    if (isLiked) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {

@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-context';
+import { WishlistProvider } from '@/context/wishlist-context';
 import 'react-icons/fa';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { cn } from '@/lib/utils';
@@ -48,15 +49,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <CartProvider>
-            <AuthProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <FootballLoader />
-                <Navbar />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-              <Toaster />
-            </AuthProvider>
+            <WishlistProvider>
+              <AuthProvider>
+                <div className="relative flex min-h-screen flex-col">
+                  <FootballLoader />
+                  <Navbar />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+                <Toaster />
+              </AuthProvider>
+            </WishlistProvider>
           </CartProvider>
         </ThemeProvider>
       </body>

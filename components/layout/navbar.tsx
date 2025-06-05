@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
+import { useWishlist } from "@/context/wishlist-context";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -30,7 +31,8 @@ const navLinks = [
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { cartItems } = useCart(); 
+  const { cartItems } = useCart();
+  const { wishlist } = useWishlist();
   const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -176,8 +178,16 @@ const Navbar = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/wishlist" className="w-full cursor-pointer flex items-center">
-                    <Heart className="mr-2 h-4 w-4" /> Wishlist
+                  <Link href="/wishlist" className="w-full cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Heart className="mr-2 h-4 w-4" />
+                      <span>Wishlist</span>
+                    </div>
+                    {wishlist.length > 0 && (
+                      <span className="ml-2 text-xs bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center">
+                        {wishlist.length}
+                      </span>
+                    )}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
