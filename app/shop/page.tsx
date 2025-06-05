@@ -130,7 +130,7 @@ export default function ShopPage() {
   ];
 
   return (
-    <div className="container py-12">
+    <div className="w-full max-w-[2000px] mx-auto px-4 py-12">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-4">
           <div className="flex justify-between items-center">
