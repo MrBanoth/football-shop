@@ -23,14 +23,29 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const { addToCart, isInCart } = useCart();
   
   // Find the product based on the ID
-  const product = productsData.products.find(
+  const productData = productsData.products.find(
     (p) => p.id === parseInt(params.id)
   );
 
   // Handle product not found
-  if (!product) {
+  if (!productData) {
     notFound();
   }
+
+  // Ensure the product data matches the Product type
+  const product: Product = {
+    id: productData.id,
+    name: productData.name,
+    price: productData.price,
+    description: productData.description,
+    category: productData.category as "jerseys" | "shoes" | "balls" | "accessories",
+    sizes: productData.sizes || [],
+    colors: productData.colors || [],
+    images: productData.images || [],
+    rating: productData.rating || 0,
+    featured: productData.featured || false,
+    stock: productData.stock || 0
+  };
 
   // Get related products (same category)
   const relatedProducts = productsData.products
