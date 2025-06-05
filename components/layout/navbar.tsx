@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, ShoppingCart, Search, X, ChevronDown, LogOut, User as UserIcon, Heart } from "lucide-react";
+import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,9 +89,14 @@ const Navbar = () => {
         {/* Left Section: Logo */}
         <div className="flex flex-1 justify-start">
           <Link href="/" className="flex items-center space-x-2" onClick={() => isMenuOpen && setIsMenuOpen(false)}>
-            {/* <Image src="/logo.png" alt="GoalGear Logo" width={32} height={32} className="h-8 w-8" /> */}
-            <span className="text-xl font-bold text-primary">Goal</span>
-            <span className="text-xl font-bold text-red-500">Gear</span>
+            <Image 
+              src="/images/logo.png" 
+              alt="GoalGear Logo" 
+              width={120} 
+              height={40} 
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
         </div>
 

@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, ShoppingCart, Trash2, CreditCard } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2, CreditCard, CheckCircle2, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/cart-context";
+import confetti from 'canvas-confetti';
 // Toast notifications removed as per user request
 
 export default function CartPage() {
@@ -24,6 +25,9 @@ export default function CartPage() {
   } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [promoStatus, setPromoStatus] = useState<'idle' | 'applied' | 'invalid'>('idle');
+  const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
+  const applyButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handle quantity changes
   const handleQuantityChange = (productId: number, newQuantity: number) => {
@@ -32,21 +36,59 @@ export default function CartPage() {
     }
   };
 
-  // Handle promo code - toast notification removed as per user request
+  // Handle promo code
   const applyPromoCode = () => {
-    // Promo code logic without toast notification
+    const trimmedPromoCode = promoCode.trim().toLowerCase();
+    if (trimmedPromoCode === "sandeep") {
+      setPromoStatus('applied');
+      setPromoFeedback('Promo code "sandeep" applied!');
+      setPromoCode(""); // Clear input after applying
+      // Here you would typically apply the discount to the cart total
+      if (applyButtonRef.current) {
+        const rect = applyButtonRef.current.getBoundingClientRect();
+        const originX = (rect.left + rect.right) / 2 / window.innerWidth;
+        const originY = (rect.top + rect.bottom) / 2 / window.innerHeight;
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { x: originX, y: originY },
+          colors: ['#FFC700', '#FF0000', '#2E3192', '#48BB78'] // Example colors
+        });
+      }
+    } else if (trimmedPromoCode !== "") {
+      setPromoStatus('invalid');
+      setPromoFeedback('Invalid promo code.');
+    } else {
+      setPromoStatus('idle');
+      setPromoFeedback(null);
+    }
+    setTimeout(() => { // Clear feedback message after a few seconds
+      setPromoFeedback(null);
+      if (trimmedPromoCode !== "sandeep" && trimmedPromoCode !== "") setPromoStatus('idle');
+    }, 3000);
   };
 
-  // Handle checkout - toast notification removed as per user request
+  // Handle checkout with animations
   const handleCheckout = () => {
     setIsCheckingOut(true);
     
     // Simulate checkout process
     setTimeout(() => {
+      // Generate a random order ID
+      const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+      
+      // Get cart items before clearing
+      const orderItems = [...cartItems];
+      const orderTotal = getCartTotal();
+      const orderShipping = orderTotal > 150 ? 0 : 10;
+      
+      // Clear cart after successful checkout
       clearCart();
-      router.push("/shop");
+      
+      // Navigate to order confirmation page with order details
+      router.push(`/order-confirmation/${orderId}?total=${orderTotal + orderShipping}`);
       setIsCheckingOut(false);
-    }, 1500);
+    }, 2000);
   };
 
   // Calculate order summary
@@ -205,22 +247,45 @@ export default function CartPage() {
                   onChange={(e) => setPromoCode(e.target.value)}
                 />
                 <Button
-                  variant="outline"
+                  ref={applyButtonRef}
+                  variant={promoStatus === 'applied' ? 'default' : 'outline'}
                   onClick={applyPromoCode}
-                  disabled={!promoCode.trim()}
+                  disabled={!promoCode.trim() || promoStatus === 'applied'}
+                  className={`transition-all duration-300 ease-in-out ${promoStatus === 'applied' ? 'bg-green-500 hover:bg-green-600 text-white' : ''}`}
                 >
-                  Apply
+                  {promoStatus === 'applied' ? (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" /> Applied
+                    </>
+                  ) : (
+                    'Apply'
+                  )}
                 </Button>
               </div>
+
+              {promoFeedback && (
+                <div
+                  className={`mt-2 text-sm flex items-center transition-all duration-500 ease-out 
+                    ${promoStatus === 'applied' ? 'text-green-600' : promoStatus === 'invalid' ? 'text-red-500' : 'text-muted-foreground'}
+                    opacity-100 translate-y-0`}
+                  // For a fade-in effect, you might need to manage opacity with state if not using a library
+                >
+                  {promoStatus === 'applied' && <CheckCircle2 className="h-4 w-4 mr-1.5 flex-shrink-0" />}
+                  {promoFeedback}
+                </div>
+              )}
               
               <Button
-                className="w-full"
+                className={`w-full transition-all duration-300 ${isCheckingOut ? 'opacity-90' : ''}`}
                 size="lg"
                 onClick={handleCheckout}
                 disabled={isCheckingOut}
               >
                 {isCheckingOut ? (
-                  "Processing..."
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-4 w-4" /> Checkout

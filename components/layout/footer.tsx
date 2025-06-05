@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,8 +14,13 @@ const Footer = () => {
               href="/"
               className="text-2xl font-bold tracking-tight flex items-center"
             >
-              <span className="text-primary">Goal</span>
-              <span className="text-red-500">Gear</span>
+              <Image 
+                src="/images/logo.png" 
+                alt="GoalGear Logo" 
+                width={140} 
+                height={50} 
+                className="h-12 w-auto object-contain"
+              />
             </Link>
             <p className="mt-4 text-muted-foreground">
               Premium football equipment for professionals and enthusiasts alike.
@@ -131,7 +137,16 @@ const Footer = () => {
         </div>
         
         <div className="border-t mt-12 pt-6 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} GoalGear. All rights reserved.</p>
+          <div className="flex flex-col items-center space-y-2">
+            <Image 
+              src="/images/logo.png" 
+              alt="GoalGear Logo" 
+              width={100} 
+              height={34} 
+              className="h-8 w-auto object-contain opacity-80"
+            />
+            <p>&copy; {new Date().getFullYear()} GoalGear. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>
