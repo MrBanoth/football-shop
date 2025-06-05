@@ -1,0 +1,16 @@
+.git
+.gitignore
+.vercel
+.env.local
+.env.*.local
+.vercel
+.next
+node_modules
+*.md
+*.mdx
+*.log
+.cache
+.DS_Store
+*.pem
+public/static/images/*
+!public/static/images/placeholder.png
