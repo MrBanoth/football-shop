@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, MapPin } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AccountPage() {
+  const { updateUserProfile } = useAuth();
   const [username, setUsername] = useState('');
   const [location, setLocation] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null); // Will be set by useEffect
@@ -58,13 +60,26 @@ export default function AccountPage() {
     // Save to local storage
     localStorage.setItem('profileUsername', username);
     localStorage.setItem('profileLocation', location);
-    if (imagePreview) {
+
+    let profilePictureUrl: string | undefined = undefined;
+    if (imagePreview && imagePreview !== 'https://github.com/shadcn.png') { // Don't save default as actual image
       localStorage.setItem('profileImageUrl', imagePreview);
+      profilePictureUrl = imagePreview;
     } else {
       localStorage.removeItem('profileImageUrl');
+      // If imagePreview was the default, ensure it's not sent to updateUserProfile as an actual picture
+      if (imagePreview === 'https://github.com/shadcn.png') profilePictureUrl = undefined;
     }
-    console.log('Profile data saved to localStorage:', { username, location, imagePreview });
-    alert('Profile updated successfully and saved to local storage!');
+
+    // Update AuthContext
+    updateUserProfile({
+      name: username,
+      profilePicture: profilePictureUrl
+      // email is not managed on this page, so we don't include it in the update
+    });
+
+    console.log('Profile data saved to localStorage and AuthContext updated:', { username, location, profilePicture: profilePictureUrl });
+    alert('Profile updated successfully!');
   };
 
   return (

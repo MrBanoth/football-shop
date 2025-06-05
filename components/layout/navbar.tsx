@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, ShoppingCart, Search, X, ChevronDown, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, ShoppingCart, Search, X, ChevronDown, LogOut, User as UserIcon, Heart } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
@@ -151,14 +152,17 @@ const Navbar = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full sm:h-10 sm:w-auto sm:px-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {user.name ? (
-                        <span className="text-sm font-medium">{user.name.charAt(0).toUpperCase()}</span>
-                    ) : (
+                <Button variant="ghost" size="icon" className="relative rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-10 sm:w-auto sm:px-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.profilePicture} alt={user.name || 'User'} />
+                    <AvatarFallback>
+                      {user.name ? (
+                        user.name.charAt(0).toUpperCase()
+                      ) : (
                         <UserIcon className="h-4 w-4" />
-                    )}
-                  </div>
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="hidden sm:inline-block ml-2 text-sm font-medium text-muted-foreground">{user.name ? user.name.split(' ')[0] : 'Account'}</span>
                   <ChevronDown className="hidden sm:inline-block ml-1 h-4 w-4 opacity-70" />
                 </Button>
@@ -171,6 +175,11 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/wishlist" className="w-full cursor-pointer flex items-center">
+                    <Heart className="mr-2 h-4 w-4" /> Wishlist
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="w-full cursor-pointer flex items-center">
                     <UserIcon className="mr-2 h-4 w-4" /> Profile
@@ -188,7 +197,7 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden sm:flex items-center space-x-2">
               <Button variant="outline" size="sm" asChild>
                 <Link href="/login">Sign In</Link>
               </Button>
@@ -198,7 +207,7 @@ const Navbar = () => {
             </div>
           )}
 
-          <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full" asChild>
+          <Button variant="ghost" size="icon" className="relative rounded-full" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               <span className="sr-only">Cart</span>
@@ -213,7 +222,7 @@ const Navbar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden h-9 w-9 rounded-full"
+            className="md:hidden rounded-full"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -264,13 +273,16 @@ const Navbar = () => {
               ) : (
                 <div className="space-y-1">
                   <div className="flex items-center space-x-3 px-3 py-2 mb-1">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      {user.name ? (
-                        <span className="text-lg font-medium">{user.name.charAt(0).toUpperCase()}</span>
-                      ) : (
-                        <UserIcon className="h-5 w-5" />
-                      )}
-                    </div>
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.profilePicture} alt={user.name || 'User'} />
+                      <AvatarFallback>
+                        {user.name ? (
+                          <span className="text-lg font-medium">{user.name.charAt(0).toUpperCase()}</span>
+                        ) : (
+                          <UserIcon className="h-5 w-5" />
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <p className="text-sm font-medium leading-none text-foreground">{user.name || "User Account"}</p>
                       {user.email && <p className="text-xs leading-none text-muted-foreground">{user.email}</p>}

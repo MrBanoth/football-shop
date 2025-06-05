@@ -7,6 +7,7 @@ type User = {
   id: string;
   email: string;
   name: string;
+  profilePicture?: string; // Added for profile image
   // Add other user fields as needed
 };
 
@@ -16,6 +17,7 @@ type AuthContextType = {
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
+  updateUserProfile: (updatedFields: Partial<User>) => void; // Added for profile updates
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,6 +97,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateUserProfile = (updatedFields: Partial<User>) => {
+    if (user) {
+      const newUser = { ...user, ...updatedFields };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(newUser));
+      }
+      setUser(newUser);
+    } else {
+      console.warn('updateUserProfile called when user is null');
+    }
+  };
+
   const logout = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
@@ -104,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUserProfile }}>
       {!loading && children}
     </AuthContext.Provider>
   );
